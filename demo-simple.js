@@ -6,7 +6,7 @@ async function main() {
     try {
         // Super simple usage - just pass a URL!
         const boardUrl = 'https://trello.com/b/cHkkifBS/trello-api-proxy-tasts';
-        const board = TrelloProxy.boardFromUrl(boardUrl);
+        const board = await TrelloProxy.boardFromUrl(boardUrl);
         
         console.log('Simplified Trello API Usage Demo\n');
         console.log('Board URL:', boardUrl, '\n');

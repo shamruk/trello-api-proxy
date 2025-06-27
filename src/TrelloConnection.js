@@ -1,12 +1,12 @@
 /**
- * TrelloAccount - Handles authentication and base API requests
+ * TrelloConnection - Handles authentication and base API requests
  */
 
 import axios from 'axios';
 
-class TrelloAccount {
+class TrelloConnection {
     /**
-     * Initialize Trello Account with authentication
+     * Initialize Trello Connection with authentication
      * @param {string} apiKey - Trello API key
      * @param {string} token - Trello API token
      */
@@ -66,30 +66,6 @@ class TrelloAccount {
         return markdown;
     }
 
-    /**
-     * Get board ID from URL
-     * @param {string} url - Trello board URL
-     * @returns {string} Board ID
-     */
-    extractBoardIdFromUrl(url) {
-        const match = url.match(/trello\.com\/b\/([a-zA-Z0-9]+)/);
-        if (!match) {
-            throw new Error('Invalid Trello board URL');
-        }
-        return match[1];
-    }
-
-    /**
-     * Get TrelloBoard instance by URL
-     * @param {string} url - Trello board URL
-     * @returns {TrelloBoard} TrelloBoard instance
-     */
-    async getBoardByUrl(url) {
-        // Import dynamically to avoid circular dependency
-        const { default: TrelloBoard } = await import('./TrelloBoard.js');
-        const boardId = this.extractBoardIdFromUrl(url);
-        return new TrelloBoard(this, boardId);
-    }
 }
 
-export default TrelloAccount;
+export default TrelloConnection;

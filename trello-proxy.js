@@ -6,7 +6,7 @@
  */
 
 import dotenv from 'dotenv';
-import { boardFromUrl, TrelloAccount, TrelloBoard } from './src/index.js';
+import { boardFromUrl, TrelloConnection, TrelloBoard } from './src/index.js';
 
 // Load environment variables
 dotenv.config();
@@ -31,7 +31,7 @@ async function main() {
 }
 
 // Re-export everything from src/index.js
-export { boardFromUrl, TrelloAccount, TrelloBoard } from './src/index.js';
+export { boardFromUrl, TrelloConnection, TrelloBoard } from './src/index.js';
 
 if (import.meta.url === `file://${process.argv[1]}`) {
     main();

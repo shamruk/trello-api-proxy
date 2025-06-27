@@ -3,12 +3,12 @@
  */
 
 import { jest } from '@jest/globals';
-import { TrelloAccount } from './trello-proxy.js';
+import { TrelloConnection } from './trello-proxy.js';
 
 // We'll use manual mocking for axios since Jest's ESM support is still experimental
 const mockAxiosGet = jest.fn();
 
-describe('TrelloAccount', () => {
+describe('TrelloConnection', () => {
     let proxy;
     const apiKey = process.env.TRELLO_API_KEY || 'test-api-key';
     const token = process.env.TRELLO_TOKEN || 'test-token';
@@ -182,7 +182,7 @@ describe('TrelloAccount', () => {
 });
 
 // Integration tests (only run with real credentials)
-describe('TrelloAccount Integration Tests', () => {
+describe('TrelloConnection Integration Tests', () => {
     const realApiKey = process.env.TRELLO_API_KEY;
     const realToken = process.env.TRELLO_TOKEN;
     const realBoardId = process.env.TRELLO_BOARD_ID;
@@ -195,7 +195,7 @@ describe('TrelloAccount Integration Tests', () => {
     let proxy;
 
     beforeEach(() => {
-        proxy = new TrelloAccount(realApiKey, realToken);
+        proxy = new TrelloConnection(realApiKey, realToken);
         // Unmock axios for integration tests
         jest.unmock('axios');
     });

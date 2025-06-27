@@ -3,7 +3,7 @@
  * Exports all classes and provides convenient access methods
  */
 
-import TrelloAccount from './TrelloAccount.js';
+import TrelloConnection from './TrelloConnection.js';
 import TrelloBoard from './TrelloBoard.js';
 import dotenv from 'dotenv';
 
@@ -24,11 +24,11 @@ export async function boardFromUrl(url) {
         throw new Error('TRELLO_API_KEY and TRELLO_TOKEN must be set in environment variables');
     }
     
-    const account = new TrelloAccount(apiKey, token);
-    return await account.getBoardByUrl(url);
+    const connection = new TrelloConnection(apiKey, token);
+    return TrelloBoard.fromUrl(url, connection);
 }
 
 // Export individual classes
-export { TrelloAccount, TrelloBoard };
+export { TrelloConnection, TrelloBoard };
 
 // No default export - use named exports

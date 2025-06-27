@@ -5,12 +5,37 @@
 class TrelloBoard {
     /**
      * Initialize Trello Board
-     * @param {TrelloAccount} account - TrelloAccount instance
+     * @param {TrelloConnection} connection - TrelloConnection instance
      * @param {string} boardId - Board ID
      */
-    constructor(account, boardId) {
-        this.account = account;
+    constructor(connection, boardId) {
+        this.connection = connection;
         this.boardId = boardId;
+    }
+
+    /**
+     * Extract board ID from Trello board URL
+     * @param {string} url - Trello board URL
+     * @returns {string} Board ID
+     * @private
+     */
+    static extractBoardIdFromUrl(url) {
+        const match = url.match(/trello\.com\/b\/([a-zA-Z0-9]+)/);
+        if (!match) {
+            throw new Error('Invalid Trello board URL');
+        }
+        return match[1];
+    }
+
+    /**
+     * Create TrelloBoard instance from URL
+     * @param {string} url - Trello board URL
+     * @param {TrelloConnection} connection - TrelloConnection instance
+     * @returns {TrelloBoard} TrelloBoard instance
+     */
+    static fromUrl(url, connection) {
+        const boardId = TrelloBoard.extractBoardIdFromUrl(url);
+        return new TrelloBoard(connection, boardId);
     }
 
     /**
@@ -18,7 +43,7 @@ class TrelloBoard {
      * @returns {Promise<string>} Markdown formatted list with id and name only
      */
     async getLists() {
-        const lists = await this.account.makeRequest(`boards/${this.boardId}/lists`, { fields: 'id,name' });
+        const lists = await this.connection.makeRequest(`boards/${this.boardId}/lists`, { fields: 'id,name' });
         
         let markdown = '# Lists in Board\n\n';
         for (const list of lists) {
@@ -34,7 +59,7 @@ class TrelloBoard {
      * @returns {Promise<string>} Markdown formatted list with id and name only
      */
     async getCards() {
-        const cards = await this.account.makeRequest(`boards/${this.boardId}/cards`, { fields: 'id,name' });
+        const cards = await this.connection.makeRequest(`boards/${this.boardId}/cards`, { fields: 'id,name' });
         
         let markdown = '# Cards in Board\n\n';
         for (const card of cards) {
@@ -51,7 +76,7 @@ class TrelloBoard {
      * @returns {Promise<string>} Markdown formatted card details
      */
     async getCard(cardId) {
-        const card = await this.account.makeRequest(`cards/${cardId}`, {
+        const card = await this.connection.makeRequest(`cards/${cardId}`, {
             fields: 'id,name,desc,closed,due,dueComplete,dateLastActivity,idBoard,idList,pos,shortUrl,labels,badges',
             attachments: 'true',
             attachment_fields: 'id,name,url,bytes,date',
@@ -152,7 +177,7 @@ class TrelloBoard {
         };
         
         try {
-            const card = await this.account.makeRequest('cards', params, 'POST');
+            const card = await this.connection.makeRequest('cards', params, 'POST');
             
             // Return a markdown formatted confirmation
             let markdown = `# Card Created Successfully\n\n`;

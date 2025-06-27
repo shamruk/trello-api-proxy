@@ -8,6 +8,7 @@ A simplified Trello API proxy that returns data in markdown format optimized for
 - **Get Lists**: Retrieve all lists in a board (id and name only)  
 - **Get Cards**: Retrieve all cards in a board (id and name only)
 - **Get Card Details**: Retrieve detailed card information excluding members and permissions
+- **Create Card**: Create new cards in a list with optional description, due date, and position
 
 ## Installation
 
@@ -51,6 +52,15 @@ console.log(cardsMd);
 // Get detailed card information
 const cardMd = await proxy.getCard('card-id');
 console.log(cardMd);
+
+// Create a new card
+const newCardMd = await proxy.createCard('list-id', {
+    name: 'My New Card',
+    desc: 'Card description',
+    pos: 'bottom',
+    due: '2024-12-31T23:59:59.000Z'
+});
+console.log(newCardMd);
 ```
 
 ### Command Line
@@ -137,6 +147,21 @@ Returns detailed information about a specific card including:
 - Checklists with item completion status
 - Recent comments (last 10)
 - Short URL to the card
+
+### `async createCard(idList, options)`
+Creates a new card in the specified list and returns a markdown confirmation.
+
+**Parameters:**
+- `idList` (required) - The ID of the list to add the card to
+- `options` (object) - Card creation options:
+  - `name` (string) - Name of the card
+  - `desc` (string, optional) - Description of the card
+  - `pos` (string, optional) - Position in the list ('top', 'bottom', or a number)
+  - `due` (string, optional) - Due date as ISO string
+  - `idMembers` (array, optional) - Array of member IDs to assign
+  - `idLabels` (array, optional) - Array of label IDs to add
+
+**Returns:** Markdown formatted confirmation with the created card's ID and details.
 
 ## Error Handling
 

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "WebFetch(domain:developer.atlassian.com)",
+      "Bash(npm test)",
+      "Bash(DEMO_CREATE_CARD=true node demo.js)",
+      "Bash(TRELLO_BOARD_ID=685f1a6eea6a274a8a412416 DEMO_CREATE_CARD=true node demo.js)"
+    ],
+    "deny": []
+  }
+}

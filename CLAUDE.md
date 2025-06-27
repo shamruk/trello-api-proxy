@@ -54,4 +54,7 @@ All methods follow a consistent pattern:
 - Errors include descriptive messages about what operation failed
 - HTTP errors preserved with status codes and response data
 
+### Trello API
+https://developer.atlassian.com/cloud/trello/rest/
+
 @TASKS.md

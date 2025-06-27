@@ -31,14 +31,26 @@ class TrelloProxy {
      * Make authenticated request to Trello API
      * @param {string} endpoint - API endpoint
      * @param {Object} params - Additional query parameters
+     * @param {string} method - HTTP method (GET or POST)
+     * @param {Object} data - Request body data for POST requests
      * @returns {Promise<any>} API response data
      */
-    async makeRequest(endpoint, params = {}) {
+    async makeRequest(endpoint, params = {}, method = 'GET', data = null) {
         const url = `${this.baseUrl}${endpoint}`;
         const requestParams = { ...this.authParams, ...params };
         
         try {
-            const response = await axios.get(url, { params: requestParams });
+            const config = {
+                method: method,
+                url: url,
+                params: requestParams
+            };
+            
+            if (method === 'POST' && data) {
+                config.data = data;
+            }
+            
+            const response = await axios(config);
             return response.data;
         } catch (error) {
             throw new Error(`Trello API error: ${error.message}`);
@@ -176,6 +188,58 @@ class TrelloProxy {
         markdown += `\n**URL**: ${card.shortUrl}\n`;
         
         return markdown;
+    }
+
+    /**
+     * Create a new card in a list
+     * @param {string} idList - The ID of the list to add the card to
+     * @param {Object} options - Card options
+     * @param {string} options.name - Name of the card
+     * @param {string} [options.desc] - Description of the card
+     * @param {string} [options.pos] - Position of the card in the list ('top', 'bottom', or a number)
+     * @param {string} [options.due] - Due date as ISO string
+     * @param {Array<string>} [options.idMembers] - Array of member IDs to assign
+     * @param {Array<string>} [options.idLabels] - Array of label IDs to add
+     * @returns {Promise<string>} Markdown formatted confirmation with card details
+     */
+    async createCard(idList, options = {}) {
+        if (!idList) {
+            throw new Error('List ID is required to create a card');
+        }
+        
+        // Build the request parameters
+        const params = {
+            idList,
+            ...options
+        };
+        
+        try {
+            const card = await this.makeRequest('cards', params, 'POST');
+            
+            // Return a markdown formatted confirmation
+            let markdown = `# Card Created Successfully\n\n`;
+            markdown += `## ${card.name}\n`;
+            markdown += `- **ID**: \`${card.id}\`\n`;
+            markdown += `- **List ID**: \`${card.idList}\`\n`;
+            
+            if (card.desc) {
+                markdown += `\n### Description\n${card.desc}\n`;
+            }
+            
+            if (card.due) {
+                markdown += `\n### Due Date\n${card.due}\n`;
+            }
+            
+            if (card.url) {
+                markdown += `\n**URL**: ${card.url}\n`;
+            } else if (card.shortUrl) {
+                markdown += `\n**URL**: ${card.shortUrl}\n`;
+            }
+            
+            return markdown;
+        } catch (error) {
+            throw new Error(`Failed to create card: ${error.message}`);
+        }
     }
 }
 

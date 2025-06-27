@@ -54,6 +54,32 @@ async function main() {
             console.log('No cards found in the board to show details');
         }
         
+        // 5. Create a new card (optional - only if DEMO_CREATE_CARD is set)
+        if (process.env.DEMO_CREATE_CARD === 'true') {
+            console.log('\n5. CREATE NEW CARD');
+            console.log('-'.repeat(40));
+            
+            // Get the first list to add the card to
+            const listsData = await proxy.makeRequest(`boards/${boardId}/lists`, { fields: 'id,name', limit: '1' });
+            if (listsData.length > 0) {
+                const listId = listsData[0].id;
+                const now = new Date();
+                const dueDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+                
+                const newCard = await proxy.createCard(listId, {
+                    name: `Demo Card - ${now.toISOString()}`,
+                    desc: 'This is a demo card created by the Trello API Proxy',
+                    pos: 'bottom',
+                    due: dueDate.toISOString()
+                });
+                console.log(newCard);
+            } else {
+                console.log('No lists found in the board to create a card');
+            }
+        } else {
+            console.log('\n5. CREATE NEW CARD (Skipped - set DEMO_CREATE_CARD=true to enable)');
+        }
+        
     } catch (error) {
         console.error('Error:', error.message);
     }

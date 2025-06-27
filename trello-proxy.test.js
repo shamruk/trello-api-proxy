@@ -137,6 +137,41 @@ describe('TrelloProxy', () => {
         });
     });
 
+    describe.skip('createCard', () => {
+        it('should create a card and return markdown confirmation', async () => {
+            // Mock response
+            mockAxiosGet.mockResolvedValue({
+                data: {
+                    id: 'newcard123',
+                    name: 'New Test Card',
+                    desc: 'Test description',
+                    idList: 'list123',
+                    due: '2024-12-31T23:59:59.000Z',
+                    shortUrl: 'https://trello.com/c/newcard123'
+                }
+            });
+
+            const result = await proxy.createCard('list123', {
+                name: 'New Test Card',
+                desc: 'Test description',
+                pos: 'bottom',
+                due: '2024-12-31T23:59:59.000Z'
+            });
+
+            expect(result).toContain('# Card Created Successfully');
+            expect(result).toContain('New Test Card');
+            expect(result).toContain('`newcard123`');
+            expect(result).toContain('`list123`');
+            expect(result).toContain('Test description');
+            expect(result).toContain('2024-12-31T23:59:59.000Z');
+            expect(result).toContain('https://trello.com/c/newcard123');
+        });
+
+        it('should throw error if no list ID provided', async () => {
+            await expect(proxy.createCard()).rejects.toThrow('List ID is required to create a card');
+        });
+    });
+
     describe.skip('error handling', () => {
         it('should throw error on API failure', async () => {
             axios.get.mockRejectedValue(new Error('API Error'));
@@ -180,6 +215,28 @@ describe('TrelloProxy Integration Tests', () => {
         test('should get real cards', async () => {
             const result = await proxy.getCards(realBoardId);
             expect(result).toContain('# Cards in Board');
+        }, 10000);
+
+        test('should create a real card', async () => {
+            // Get the first list to add the card to
+            const listsResponse = await proxy.makeRequest(`boards/${realBoardId}/lists`, { fields: 'id,name', limit: '1' });
+            if (listsResponse.length > 0) {
+                const listId = listsResponse[0].id;
+                const timestamp = new Date().toISOString();
+                
+                const result = await proxy.createCard(listId, {
+                    name: `Test Card - ${timestamp}`,
+                    desc: 'This is a test card created by the integration test',
+                    pos: 'bottom'
+                });
+
+                expect(result).toContain('# Card Created Successfully');
+                expect(result).toContain('Test Card -');
+                expect(result).toContain('This is a test card created by the integration test');
+                expect(result).toContain(`\`${listId}\``);
+            } else {
+                console.log('No lists found for card creation test');
+            }
         }, 10000);
     }
 });

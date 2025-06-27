@@ -4,5 +4,5 @@ Board is https://trello.com/b/cHkkifBS/trello-api-proxy-tasts
 List with tasks to do is called "ToDo"
 List with completed tasks is called "Done"
 You should usually take tasks from ToDo list unless told otherwise
-When task completed: add summary comment and move to completed
+When task completed: add summary comment (include steps taken) and mark as completed
 Next task refers to first task in "ToDo" list

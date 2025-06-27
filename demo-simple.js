@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import TrelloProxy from './trello-proxy.js';
+import { boardFromUrl } from './trello-proxy.js';
 
 async function main() {
     try {
         // Super simple usage - just pass a URL!
         const boardUrl = 'https://trello.com/b/cHkkifBS/trello-api-proxy-tasts';
-        const board = await TrelloProxy.boardFromUrl(boardUrl);
+        const board = await boardFromUrl(boardUrl);
         
         console.log('Simplified Trello API Usage Demo\n');
         console.log('Board URL:', boardUrl, '\n');

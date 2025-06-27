@@ -11,9 +11,9 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-class TrelloProxy {
+class TrelloAccount {
     /**
-     * Initialize Trello API proxy
+     * Initialize Trello Account with authentication
      * @param {string} apiKey - Trello API key
      * @param {string} token - Trello API token
      */
@@ -74,12 +74,46 @@ class TrelloProxy {
     }
 
     /**
-     * Get all lists in a board
+     * Get board ID from URL
+     * @param {string} url - Trello board URL
+     * @returns {string} Board ID
+     */
+    extractBoardIdFromUrl(url) {
+        const match = url.match(/trello\.com\/b\/([a-zA-Z0-9]+)/);
+        if (!match) {
+            throw new Error('Invalid Trello board URL');
+        }
+        return match[1];
+    }
+
+    /**
+     * Get TrelloBoard instance by URL
+     * @param {string} url - Trello board URL
+     * @returns {TrelloBoard} TrelloBoard instance
+     */
+    getBoardByUrl(url) {
+        const boardId = this.extractBoardIdFromUrl(url);
+        return new TrelloBoard(this, boardId);
+    }
+}
+
+class TrelloBoard {
+    /**
+     * Initialize Trello Board
+     * @param {TrelloAccount} account - TrelloAccount instance
      * @param {string} boardId - Board ID
+     */
+    constructor(account, boardId) {
+        this.account = account;
+        this.boardId = boardId;
+    }
+
+    /**
+     * Get all lists in this board
      * @returns {Promise<string>} Markdown formatted list with id and name only
      */
-    async getLists(boardId) {
-        const lists = await this.makeRequest(`boards/${boardId}/lists`, { fields: 'id,name' });
+    async getLists() {
+        const lists = await this.account.makeRequest(`boards/${this.boardId}/lists`, { fields: 'id,name' });
         
         let markdown = '# Lists in Board\n\n';
         for (const list of lists) {
@@ -91,12 +125,11 @@ class TrelloProxy {
     }
 
     /**
-     * Get all cards in a board
-     * @param {string} boardId - Board ID
+     * Get all cards in this board
      * @returns {Promise<string>} Markdown formatted list with id and name only
      */
-    async getCards(boardId) {
-        const cards = await this.makeRequest(`boards/${boardId}/cards`, { fields: 'id,name' });
+    async getCards() {
+        const cards = await this.account.makeRequest(`boards/${this.boardId}/cards`, { fields: 'id,name' });
         
         let markdown = '# Cards in Board\n\n';
         for (const card of cards) {
@@ -113,7 +146,7 @@ class TrelloProxy {
      * @returns {Promise<string>} Markdown formatted card details
      */
     async getCard(cardId) {
-        const card = await this.makeRequest(`cards/${cardId}`, {
+        const card = await this.account.makeRequest(`cards/${cardId}`, {
             fields: 'id,name,desc,closed,due,dueComplete,dateLastActivity,idBoard,idList,pos,shortUrl,labels,badges',
             attachments: 'true',
             attachment_fields: 'id,name,url,bytes,date',
@@ -214,7 +247,7 @@ class TrelloProxy {
         };
         
         try {
-            const card = await this.makeRequest('cards', params, 'POST');
+            const card = await this.account.makeRequest('cards', params, 'POST');
             
             // Return a markdown formatted confirmation
             let markdown = `# Card Created Successfully\n\n`;
@@ -240,6 +273,41 @@ class TrelloProxy {
         } catch (error) {
             throw new Error(`Failed to create card: ${error.message}`);
         }
+    }
+}
+
+// Backward compatibility wrapper
+class TrelloProxy {
+    constructor(apiKey, token) {
+        this.account = new TrelloAccount(apiKey, token);
+    }
+
+    async makeRequest(endpoint, params = {}, method = 'GET', data = null) {
+        return this.account.makeRequest(endpoint, params, method, data);
+    }
+
+    async getBoards() {
+        return this.account.getBoards();
+    }
+
+    async getLists(boardId) {
+        const board = new TrelloBoard(this.account, boardId);
+        return board.getLists();
+    }
+
+    async getCards(boardId) {
+        const board = new TrelloBoard(this.account, boardId);
+        return board.getCards();
+    }
+
+    async getCard(cardId) {
+        const board = new TrelloBoard(this.account, 'dummy');
+        return board.getCard(cardId);
+    }
+
+    async createCard(idList, options = {}) {
+        const board = new TrelloBoard(this.account, 'dummy');
+        return board.createCard(idList, options);
     }
 }
 
@@ -278,7 +346,8 @@ async function main() {
     }
 }
 
-// Export the class and run main if called directly
+// Export classes
+export { TrelloAccount, TrelloBoard };
 export default TrelloProxy;
 
 if (import.meta.url === `file://${process.argv[1]}`) {

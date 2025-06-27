@@ -309,6 +309,26 @@ class TrelloProxy {
         const board = new TrelloBoard(this.account, 'dummy');
         return board.createCard(idList, options);
     }
+    
+    /**
+     * Static method to get TrelloBoard by URL with automatic credentials
+     * @param {string} url - Trello board URL
+     * @returns {TrelloBoard} TrelloBoard instance
+     */
+    static boardFromUrl(url) {
+        // Load environment variables if not already loaded
+        dotenv.config();
+        
+        const apiKey = process.env.TRELLO_API_KEY;
+        const token = process.env.TRELLO_TOKEN;
+        
+        if (!apiKey || !token) {
+            throw new Error('TRELLO_API_KEY and TRELLO_TOKEN must be set in environment variables');
+        }
+        
+        const account = new TrelloAccount(apiKey, token);
+        return account.getBoardByUrl(url);
+    }
 }
 
 /**

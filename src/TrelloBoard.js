@@ -268,7 +268,6 @@ class TrelloBoard {
 
     /**
      * Mark a task as completed (sets dueComplete to true)
-     * Note: This only works for tasks that have a due date set
      * @param {string} taskId - The ID of the task to mark as completed
      * @returns {Promise<string>} Markdown formatted confirmation
      */

@@ -50,7 +50,7 @@ const newTask = await board.createTask(listId, {
 // Add a comment to a task
 await board.commentTask(taskId, 'This is a comment');
 
-// Mark task as completed (requires due date)
+// Mark task as completed
 await board.markTaskCompleted(taskId);
 
 // Archive a task

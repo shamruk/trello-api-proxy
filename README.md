@@ -8,7 +8,7 @@ A Node.js module that provides simplified access to Trello data in markdown form
 import { boardFromUrl } from './trello-proxy.js';
 
 const board = await boardFromUrl('YOUR_BOARD_URL');
-const tasks = await board.getTasks('ToDo');
+const tasks = await board.getFirstOpenTask('ToDo');
 console.log(tasks);
 ```
 
@@ -29,11 +29,11 @@ const board = await boardFromUrl(boardUrl);
 // Get all lists in the board
 const lists = await board.getLists();
 
-// Get all tasks in the board
-const allTasks = await board.getAllTasks();
+// Get all task names in the board
+const allTaskNames = await board.getAllTaskNames();
 
-// Get tasks from a specific list
-const todoTasks = await board.getTasks('ToDo');
+// Get task names from a specific list
+const todoTaskNames = await board.getTaskNames('ToDo');
 
 // Get first open task from a list (not archived AND not dueComplete)
 const firstOpenTask = await board.getFirstOpenTask('ToDo');

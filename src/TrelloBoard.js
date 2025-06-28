@@ -55,10 +55,10 @@ class TrelloBoard {
     }
 
     /**
-     * Get all tasks in this board
+     * Get all task names and IDs in this board
      * @returns {Promise<string>} Markdown formatted list with id and name only
      */
-    async getAllTasks() {
+    async getAllTaskNames() {
         const tasks = await this.connection.makeRequest(`boards/${this.boardId}/cards`, { fields: 'id,name' });
         
         let markdown = '# Tasks in Board\n\n';
@@ -71,11 +71,11 @@ class TrelloBoard {
     }
 
     /**
-     * Get tasks from a specific list by name
+     * Get task names and IDs from a specific list
      * @param {string} listName - Name of the list
-     * @returns {Promise<string>} Markdown formatted tasks from the specified list
+     * @returns {Promise<string>} Markdown formatted task names and IDs from the specified list
      */
-    async getTasks(listName) {
+    async getTaskNames(listName) {
         // First, get all lists to find the one with matching name
         const lists = await this.connection.makeRequest(`boards/${this.boardId}/lists`, { fields: 'id,name' });
         

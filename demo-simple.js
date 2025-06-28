@@ -14,12 +14,12 @@ async function main() {
         // Get lists
         console.log(await board.getLists());
         
-        // Get all tasks
-        console.log(await board.getAllTasks());
+        // Get all task names
+        console.log(await board.getAllTaskNames());
         
-        // Get tasks from specific list
-        console.log('\nGetting tasks from "ToDo" list:');
-        console.log(await board.getTasks('ToDo'));
+        // Get task names from specific list
+        console.log('\nGetting task names from "ToDo" list:');
+        console.log(await board.getTaskNames('ToDo'));
         
         // Get first open task from a list
         console.log('\nGetting first open task from "ToDo" list:');

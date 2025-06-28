@@ -89,3 +89,13 @@ Implementation details here...
 
 **URL**: https://trello.com/c/abc123
 ```
+
+## Running Demos
+
+```bash
+# Simple demo
+node demos/demo-simple.js
+
+# Full demo (if working)
+node demos/demo.js
+```

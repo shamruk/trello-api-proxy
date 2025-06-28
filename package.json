@@ -23,6 +23,6 @@
     "testEnvironment": "node",
     "transform": {},
     "moduleFileExtensions": ["js"],
-    "testMatch": ["**/*.test.js"]
+    "testMatch": ["<rootDir>/tests/**/*.test.js"]
   }
 }

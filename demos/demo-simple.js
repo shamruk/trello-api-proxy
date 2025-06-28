@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { boardFromUrl } from './trello-proxy.js';
+import { boardFromUrl } from '../trello-proxy.js';
 
 async function main() {
     try {

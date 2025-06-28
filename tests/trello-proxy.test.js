@@ -3,7 +3,7 @@
  */
 
 import { jest } from '@jest/globals';
-import { TrelloConnection } from './trello-proxy.js';
+import { TrelloConnection } from '../src/index.js';
 
 // We'll use manual mocking for axios since Jest's ESM support is still experimental
 const mockAxiosGet = jest.fn();

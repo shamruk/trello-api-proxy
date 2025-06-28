@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development Workflow
 1. Set up environment: Copy `.env.example` to `.env` and add Trello API credentials
-2. Install dependencies: `npm install`
+2. Install dependencies: `npm ci` or `npm upgrade` if needed
 3. Test changes: `npm test` (note: unit tests are skipped due to ESM mocking limitations, integration tests require real credentials)
 
 ## Architecture Overview

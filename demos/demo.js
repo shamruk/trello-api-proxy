@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { TrelloAccount, TrelloBoard } from './trello-proxy.js';
+import { TrelloAccount, TrelloBoard } from '../trello-proxy.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

@@ -109,7 +109,7 @@ class TrelloBoard {
      */
     async getTask(taskId) {
         const task = await this.connection.makeRequest(`cards/${taskId}`, {
-            fields: 'id,name,desc,closed,due,dueComplete,dateLastActivity,idBoard,idList,pos,shortUrl,labels,badges',
+            fields: 'id,name,desc,closed,due,dueComplete,dateLastActivity,idBoard,idList,pos,labels,badges',
             attachments: 'true',
             attachment_fields: 'id,name,url,bytes,date',
             checklists: 'all',
@@ -139,12 +139,18 @@ class TrelloBoard {
             }
         }
         
-        if (task.badges) {
+        if (task.badges && (task.badges.comments || task.badges.attachments || task.badges.checkItems || task.badges.checkItemsChecked)) {
             const badges = task.badges;
             markdown += '\n## Activity\n';
-            markdown += `- **Comments**: ${badges.comments || 0}\n`;
-            markdown += `- **Attachments**: ${badges.attachments || 0}\n`;
-            markdown += `- **Checklist Items**: ${badges.checkItems || 0} (${badges.checkItemsChecked || 0} complete)\n`;
+            if (badges.comments) {
+                markdown += `- **Comments**: ${badges.comments || 0}\n`;
+            }
+            if (badges.attachments) {
+                markdown += `- **Attachments**: ${badges.attachments || 0}\n`;
+            }
+            if (badges.checkItems) {
+                markdown += `- **Checklist Items**: ${badges.checkItems || 0} (${badges.checkItemsChecked || 0} complete)\n`;
+            }
         }
         
         if (task.attachments && task.attachments.length > 0) {
@@ -180,7 +186,7 @@ class TrelloBoard {
             }
         }
         
-        markdown += `\n**URL**: ${task.shortUrl}\n`;
+        // markdown += `\n**URL**: ${task.shortUrl}\n`;
         
         return markdown;
     }
@@ -213,24 +219,7 @@ class TrelloBoard {
             
             // Return a markdown formatted confirmation
             let markdown = `# Task Created Successfully\n\n`;
-            markdown += `## ${task.name}\n`;
             markdown += `- **ID**: \`${task.id}\`\n`;
-            markdown += `- **List ID**: \`${task.idList}\`\n`;
-            
-            if (task.desc) {
-                markdown += `\n### Description\n${task.desc}\n`;
-            }
-            
-            if (task.due) {
-                markdown += `\n### Due Date\n${task.due}\n`;
-            }
-            
-            if (task.url) {
-                markdown += `\n**URL**: ${task.url}\n`;
-            } else if (task.shortUrl) {
-                markdown += `\n**URL**: ${task.shortUrl}\n`;
-            }
-            
             return markdown;
         } catch (error) {
             throw new Error(`Failed to create task: ${error.message}`);
@@ -253,11 +242,7 @@ class TrelloBoard {
         }
         
         try {
-            await this.connection.makeRequest(
-                `cards/${taskId}/actions/comments`,
-                { text },
-                'POST'
-            );
+            await this.connection.makeRequest(`cards/${taskId}/actions/comments`, { text }, 'POST');
             
             // Return a markdown formatted confirmation
             return `# Comment Added Successfully\n\n`;            
@@ -327,6 +312,48 @@ class TrelloBoard {
             return `# Archived Task\n\n`;
         } catch (error) {
             throw new Error(`Failed to archive task: ${error.message}`);
+        }
+    }
+
+    /**
+     * Move a task to another list
+     * @param {string} taskId - The ID of the task to move
+     * @param {string} targetListName - The name of the list to move the task to
+     * @returns {Promise<string>} Markdown formatted confirmation
+     */
+    async moveTask(taskId, targetListName) {
+        if (!taskId) {
+            throw new Error('Task ID is required to move');
+        }
+        
+        if (!targetListName) {
+            throw new Error('Target list name is required');
+        }
+        
+        try {
+            // First, get all lists to find the target list ID
+            const lists = await this.connection.makeRequest(`boards/${this.boardId}/lists`, { fields: 'id,name' });
+            
+            // Find the target list
+            const targetList = lists.find(list => list.name === targetListName);
+            
+            if (!targetList) {
+                throw new Error(`List "${targetListName}" not found in board`);
+            }
+            
+            // Move the task by updating its idList
+            await this.connection.makeRequest(
+                `cards/${taskId}`,
+                { idList: targetList.id },
+                'PUT'
+            );
+            
+            // Get task details for confirmation
+            const task = await this.connection.makeRequest(`cards/${taskId}`, { fields: 'name' });
+            
+            return `# Task Moved Successfully\n\n## ${task.name}\n- **Task ID**: \`${taskId}\`\n- **Moved to**: ${targetListName}\n- **New List ID**: \`${targetList.id}\`\n`;
+        } catch (error) {
+            throw new Error(`Failed to move task: ${error.message}`);
         }
     }
 }

@@ -66,6 +66,25 @@ async function main() {
             console.log('Note: Mark completed feature requires write permissions');
         }
         
+        // Example: Move a task to another list
+        console.log('\nMoving a task to another list:');
+        try {
+            const moveTestTask = await board.createTask(todoList.id, {
+                name: 'Demo task to move',
+                desc: 'This task will be moved to Done list'
+            });
+            
+            const moveTaskIdMatch = moveTestTask.match(/- \*\*ID\*\*: `([^`]+)`/);
+            const moveTaskId = moveTaskIdMatch ? moveTaskIdMatch[1] : null;
+            
+            if (moveTaskId) {
+                const moveResult = await board.moveTask(moveTaskId, 'Done');
+                console.log(moveResult);
+            }
+        } catch (error) {
+            console.log('Note: Move task feature requires write permissions');
+        }
+        
     } catch (error) {
         console.error('Error:', error.message);
     }

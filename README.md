@@ -55,6 +55,9 @@ await board.markTaskCompleted(taskId);
 
 // Archive a task
 await board.archiveTask(taskId);
+
+// Move a task to another list
+await board.moveTask(taskId, 'Done');
 ```
 
 ## Response Examples

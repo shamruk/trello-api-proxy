@@ -56,5 +56,6 @@ All methods follow a consistent pattern:
 
 ### Trello API
 https://developer.atlassian.com/cloud/trello/rest/
+Also note that dueComplete works on tasks without due date despite documentation 
 
 @TASKS.md

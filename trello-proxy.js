@@ -25,6 +25,9 @@ async function main() {
         console.log('Board loaded from URL:', boardUrl);
         console.log('\nLists in board:');
         console.log(await board.getLists());
+        
+        console.log('\nCards in "ToDo" list:');
+        console.log(await board.getCards('ToDo'));
     } catch (error) {
         console.error('Error:', error.message);
     }

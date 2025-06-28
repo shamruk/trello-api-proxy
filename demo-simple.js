@@ -14,8 +14,12 @@ async function main() {
         // Get lists
         console.log(await board.getLists());
         
-        // Get cards
-        console.log(await board.getCards());
+        // Get all cards
+        console.log(await board.getAllCards());
+        
+        // Get cards from specific list
+        console.log('\nGetting cards from "ToDo" list:');
+        console.log(await board.getCards('ToDo'));
         
         // Get specific card details if needed
         const cardId = '685f1bb73f21f8cc53d5a586'; // "Add create task/card method"

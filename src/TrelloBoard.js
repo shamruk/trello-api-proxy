@@ -58,13 +58,45 @@ class TrelloBoard {
      * Get all cards in this board
      * @returns {Promise<string>} Markdown formatted list with id and name only
      */
-    async getCards() {
+    async getAllCards() {
         const cards = await this.connection.makeRequest(`boards/${this.boardId}/cards`, { fields: 'id,name' });
         
         let markdown = '# Cards in Board\n\n';
         for (const card of cards) {
             markdown += `## ${card.name}\n`;
             markdown += `- **ID**: \`${card.id}\`\n\n`;
+        }
+        
+        return markdown;
+    }
+
+    /**
+     * Get cards from a specific list by name
+     * @param {string} listName - Name of the list
+     * @returns {Promise<string>} Markdown formatted cards from the specified list
+     */
+    async getCards(listName) {
+        // First, get all lists to find the one with matching name
+        const lists = await this.connection.makeRequest(`boards/${this.boardId}/lists`, { fields: 'id,name' });
+        
+        // Find the list with the specified name
+        const targetList = lists.find(list => list.name === listName);
+        
+        if (!targetList) {
+            throw new Error(`List "${listName}" not found in board`);
+        }
+        
+        // Get cards from the specific list
+        const cards = await this.connection.makeRequest(`lists/${targetList.id}/cards`, { fields: 'id,name' });
+        
+        let markdown = `# Cards in "${listName}"\n\n`;
+        if (cards.length === 0) {
+            markdown += '_No cards in this list_\n';
+        } else {
+            for (const card of cards) {
+                markdown += `## ${card.name}\n`;
+                markdown += `- **ID**: \`${card.id}\`\n\n`;
+            }
         }
         
         return markdown;

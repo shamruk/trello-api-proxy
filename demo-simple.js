@@ -21,6 +21,10 @@ async function main() {
         console.log('\nGetting tasks from "ToDo" list:');
         console.log(await board.getTasks('ToDo'));
         
+        // Get first open task from a list
+        console.log('\nGetting first open task from "ToDo" list:');
+        console.log(await board.getFirstOpenTask('ToDo'));
+        
         // Get specific task details if needed
         const taskId = '685f1bb73f21f8cc53d5a586'; // "Add create task/card method"
         console.log(await board.getTask(taskId));

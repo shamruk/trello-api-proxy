@@ -284,6 +284,41 @@ class TrelloBoard {
         }
     }
 
+    /**
+     * Get the first open task from a specific list
+     * An open task is one that is not archived (closed=false) AND not marked as due complete
+     * @param {string} listName - Name of the list to search in
+     * @returns {Promise<string>} Markdown formatted task details or message if no open tasks
+     */
+    async getFirstOpenTask(listName) {
+        // First, get all lists to find the one with matching name
+        const lists = await this.connection.makeRequest(`boards/${this.boardId}/lists`, { fields: 'id,name' });
+        
+        // Find the list with the specified name
+        const targetList = lists.find(list => list.name === listName);
+        
+        if (!targetList) {
+            throw new Error(`List "${listName}" not found in board`);
+        }
+        
+        // Get all non-archived cards from the specific list with necessary fields
+        const tasks = await this.connection.makeRequest(`lists/${targetList.id}/cards`, { 
+            fields: 'id,name,closed,dueComplete',
+            filter: 'open'  // This filter returns non-archived cards (closed=false)
+        });
+        
+        // Filter to find tasks that are not dueComplete
+        const openTasks = tasks.filter(task => !task.dueComplete);
+        
+        if (openTasks.length === 0) {
+            return `# No Open Tasks in "${listName}"\n\n_All tasks in this list are either completed or archived._\n`;
+        }
+        
+        // Get the first open task and return its details
+        const firstOpenTask = openTasks[0];
+        return await this.getTask(firstOpenTask.id);
+    }
+
     async archiveTask(taskId) {
         if (!taskId) {
             throw new Error('Task ID is required to archive');

@@ -35,9 +35,9 @@ async function main() {
         console.log('\nGetting lists...');
         console.log(await board.getLists());
         
-        // Get cards in the board
-        console.log('\nGetting cards...');
-        console.log(await board.getCards());
+        // Get tasks in the board
+        console.log('\nGetting tasks...');
+        console.log(await board.getTasks());
         
     } catch (error) {
         console.error('Error:', error.message);

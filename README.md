@@ -9,33 +9,17 @@ A simplified Trello API proxy that returns data in markdown format optimized for
       import { boardFromUrl } from './trello-proxy.js';
       const boardUrl = YOUR_BOARD_URL;
       const board = await boardFromUrl(boardUrl);
-      const todoCards = await board.getCards(TARGET_LIST_NAME);
+      const todoTasks = await board.getTasks(TARGET_LIST_NAME);
 ```      
 
 ## Features
 
 - **Get Boards**: Retrieve all accessible boards (id and name only)
 - **Get Lists**: Retrieve all lists in a board (id and name only)  
-- **Get Cards**: Retrieve all cards in a board (id and name only)
-- **Get Card Details**: Retrieve detailed card information excluding members and permissions
-- **Create Card**: Create new cards in a list with optional description, due date, and position
+- **Get Tasks**: Retrieve all tasks in a board (id and name only)
+- **Get Task Details**: Retrieve detailed task information excluding members and permissions
+- **Create Task**: Create new tasks in a list with optional description, due date, and position
 
-## Installation
-
-```bash
-npm install
-```
-
-## Configuration
-
-Create a `.env` file with your Trello credentials:
-
-```bash
-TRELLO_API_KEY=your-api-key
-TRELLO_TOKEN=your-token
-```
-
-Get your API key from: https://trello.com/app-key
 
 ## Usage
 
@@ -55,22 +39,22 @@ console.log(boardsMd);
 const listsMd = await proxy.getLists('board-id');
 console.log(listsMd);
 
-// Get cards in a board
-const cardsMd = await proxy.getCards('board-id');
-console.log(cardsMd);
+// Get tasks in a board
+const tasksMd = await proxy.getTasks('board-id');
+console.log(tasksMd);
 
-// Get detailed card information
-const cardMd = await proxy.getCard('card-id');
-console.log(cardMd);
+// Get detailed task information
+const taskMd = await proxy.getTask('task-id');
+console.log(taskMd);
 
-// Create a new card
-const newCardMd = await proxy.createCard('list-id', {
-    name: 'My New Card',
-    desc: 'Card description',
+// Create a new task
+const newTaskMd = await proxy.createTask('list-id', {
+    name: 'My New Task',
+    desc: 'Task description',
     pos: 'bottom',
     due: '2024-12-31T23:59:59.000Z'
 });
-console.log(newCardMd);
+console.log(newTaskMd);
 ```
 
 ### Command Line
@@ -95,16 +79,16 @@ All responses are formatted in markdown for easy LLM consumption:
 - **ID**: `xyz789ghi012`
 ```
 
-### Card Details Response Example
+### Task Details Response Example
 
 ```markdown
-# Card: Implement new feature
+# Task: Implement new feature
 
 - **ID**: `card123`
 - **Status**: Open
 
 ## Description
-This card tracks the implementation of the new user dashboard feature.
+This task tracks the implementation of the new user dashboard feature.
 
 ## Due Date
 - **Due**: 2024-12-31T23:59:59.000Z
@@ -143,11 +127,11 @@ Returns all accessible boards with their IDs and names in markdown format.
 ### `async getLists(boardId)`
 Returns all lists in a specified board with their IDs and names.
 
-### `async getCards(boardId)`
-Returns all cards in a specified board with their IDs and names.
+### `async getTasks(boardId)`
+Returns all tasks in a specified board with their IDs and names.
 
-### `async getCard(cardId)`
-Returns detailed information about a specific card including:
+### `async getTask(taskId)`
+Returns detailed information about a specific task including:
 - Basic info (id, name, status)
 - Description
 - Due date and completion status
@@ -156,22 +140,22 @@ Returns detailed information about a specific card including:
 - Attachments with file sizes
 - Checklists with item completion status
 - Recent comments (last 10)
-- Short URL to the card
+- Short URL to the task
 
-### `async createCard(idList, options)`
-Creates a new card in the specified list and returns a markdown confirmation.
+### `async createTask(idList, options)`
+Creates a new task in the specified list and returns a markdown confirmation.
 
 **Parameters:**
-- `idList` (required) - The ID of the list to add the card to
-- `options` (object) - Card creation options:
-  - `name` (string) - Name of the card
-  - `desc` (string, optional) - Description of the card
+- `idList` (required) - The ID of the list to add the task to
+- `options` (object) - Task creation options:
+  - `name` (string) - Name of the task
+  - `desc` (string, optional) - Description of the task
   - `pos` (string, optional) - Position in the list ('top', 'bottom', or a number)
   - `due` (string, optional) - Due date as ISO string
   - `idMembers` (array, optional) - Array of member IDs to assign
   - `idLabels` (array, optional) - Array of label IDs to add
 
-**Returns:** Markdown formatted confirmation with the created card's ID and details.
+**Returns:** Markdown formatted confirmation with the created task's ID and details.
 
 ## Error Handling
 

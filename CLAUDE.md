@@ -27,7 +27,7 @@ This is a single-module Node.js ES module implementation of a Trello API proxy d
 ### Key Components
 - **`trello-proxy.js`**: Main module exporting `TrelloProxy` class
   - Constructor takes API key and token
-  - Four main methods: `getBoards()`, `getLists(boardId)`, `getCards(boardId)`, `getCard(cardId)`
+  - Four main methods: `getBoards()`, `getLists(boardId)`, `getTasks(boardId)`, `getTask(taskId)`
   - Can be run directly as CLI (executes demo)
   
 - **`demo.js`**: Demonstration script showing all proxy methods in action

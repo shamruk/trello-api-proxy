@@ -10,7 +10,8 @@
       "Bash(mv:*)",
       "Bash(curl:*)",
       "Bash(source .env)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

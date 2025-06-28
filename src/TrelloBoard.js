@@ -55,27 +55,27 @@ class TrelloBoard {
     }
 
     /**
-     * Get all cards in this board
+     * Get all tasks in this board
      * @returns {Promise<string>} Markdown formatted list with id and name only
      */
-    async getAllCards() {
-        const cards = await this.connection.makeRequest(`boards/${this.boardId}/cards`, { fields: 'id,name' });
+    async getAllTasks() {
+        const tasks = await this.connection.makeRequest(`boards/${this.boardId}/cards`, { fields: 'id,name' });
         
-        let markdown = '# Cards in Board\n\n';
-        for (const card of cards) {
-            markdown += `## ${card.name}\n`;
-            markdown += `- **ID**: \`${card.id}\`\n\n`;
+        let markdown = '# Tasks in Board\n\n';
+        for (const task of tasks) {
+            markdown += `## ${task.name}\n`;
+            markdown += `- **ID**: \`${task.id}\`\n\n`;
         }
         
         return markdown;
     }
 
     /**
-     * Get cards from a specific list by name
+     * Get tasks from a specific list by name
      * @param {string} listName - Name of the list
-     * @returns {Promise<string>} Markdown formatted cards from the specified list
+     * @returns {Promise<string>} Markdown formatted tasks from the specified list
      */
-    async getCards(listName) {
+    async getTasks(listName) {
         // First, get all lists to find the one with matching name
         const lists = await this.connection.makeRequest(`boards/${this.boardId}/lists`, { fields: 'id,name' });
         
@@ -86,16 +86,16 @@ class TrelloBoard {
             throw new Error(`List "${listName}" not found in board`);
         }
         
-        // Get cards from the specific list
-        const cards = await this.connection.makeRequest(`lists/${targetList.id}/cards`, { fields: 'id,name' });
+        // Get tasks from the specific list
+        const tasks = await this.connection.makeRequest(`lists/${targetList.id}/cards`, { fields: 'id,name' });
         
-        let markdown = `# Cards in "${listName}"\n\n`;
-        if (cards.length === 0) {
-            markdown += '_No cards in this list_\n';
+        let markdown = `# Tasks in "${listName}"\n\n`;
+        if (tasks.length === 0) {
+            markdown += '_No tasks in this list_\n';
         } else {
-            for (const card of cards) {
-                markdown += `## ${card.name}\n`;
-                markdown += `- **ID**: \`${card.id}\`\n\n`;
+            for (const task of tasks) {
+                markdown += `## ${task.name}\n`;
+                markdown += `- **ID**: \`${task.id}\`\n\n`;
             }
         }
         
@@ -103,12 +103,12 @@ class TrelloBoard {
     }
 
     /**
-     * Get detailed information about a specific card
-     * @param {string} cardId - Card ID
-     * @returns {Promise<string>} Markdown formatted card details
+     * Get detailed information about a specific task
+     * @param {string} taskId - Task ID
+     * @returns {Promise<string>} Markdown formatted task details
      */
-    async getCard(cardId) {
-        const card = await this.connection.makeRequest(`cards/${cardId}`, {
+    async getTask(taskId) {
+        const task = await this.connection.makeRequest(`cards/${taskId}`, {
             fields: 'id,name,desc,closed,due,dueComplete,dateLastActivity,idBoard,idList,pos,shortUrl,labels,badges',
             attachments: 'true',
             attachment_fields: 'id,name,url,bytes,date',
@@ -119,37 +119,37 @@ class TrelloBoard {
             actions_limit: '10'
         });
         
-        let markdown = `# Card: ${card.name}\n\n`;
-        markdown += `- **ID**: \`${card.id}\`\n`;
-        markdown += `- **Status**: ${card.closed ? 'Closed' : 'Open'}\n`;
+        let markdown = `# Task: ${task.name}\n\n`;
+        markdown += `- **ID**: \`${task.id}\`\n`;
+        markdown += `- **Status**: ${task.closed ? 'Closed' : 'Open'}\n`;
         
-        if (card.desc) {
-            markdown += `\n## Description\n${card.desc}\n`;
+        if (task.desc) {
+            markdown += `\n## Description\n${task.desc}\n`;
         }
         
-        if (card.due) {
-            markdown += `\n## Due Date\n- **Due**: ${card.due}\n`;
-            markdown += `- **Complete**: ${card.dueComplete ? 'Yes' : 'No'}\n`;
+        if (task.due) {
+            markdown += `\n## Due Date\n- **Due**: ${task.due}\n`;
+            markdown += `- **Complete**: ${task.dueComplete ? 'Yes' : 'No'}\n`;
         }
         
-        if (card.labels && card.labels.length > 0) {
+        if (task.labels && task.labels.length > 0) {
             markdown += '\n## Labels\n';
-            for (const label of card.labels) {
+            for (const label of task.labels) {
                 markdown += `- ${label.name || 'Unnamed'} (${label.color || 'no color'})\n`;
             }
         }
         
-        if (card.badges) {
-            const badges = card.badges;
+        if (task.badges) {
+            const badges = task.badges;
             markdown += '\n## Activity\n';
             markdown += `- **Comments**: ${badges.comments || 0}\n`;
             markdown += `- **Attachments**: ${badges.attachments || 0}\n`;
             markdown += `- **Checklist Items**: ${badges.checkItems || 0} (${badges.checkItemsChecked || 0} complete)\n`;
         }
         
-        if (card.attachments && card.attachments.length > 0) {
+        if (task.attachments && task.attachments.length > 0) {
             markdown += '\n## Attachments\n';
-            for (const att of card.attachments) {
+            for (const att of task.attachments) {
                 markdown += `- [${att.name}](${att.url})`;
                 if (att.bytes) {
                     const sizeMB = (att.bytes / (1024 * 1024)).toFixed(2);
@@ -159,9 +159,9 @@ class TrelloBoard {
             }
         }
         
-        if (card.checklists && card.checklists.length > 0) {
+        if (task.checklists && task.checklists.length > 0) {
             markdown += '\n## Checklists\n';
-            for (const checklist of card.checklists) {
+            for (const checklist of task.checklists) {
                 markdown += `\n### ${checklist.name}\n`;
                 for (const item of checklist.checkItems || []) {
                     const check = item.state === 'complete' ? '✓' : '☐';
@@ -170,9 +170,9 @@ class TrelloBoard {
             }
         }
         
-        if (card.actions && card.actions.length > 0) {
+        if (task.actions && task.actions.length > 0) {
             markdown += '\n## Recent Comments\n';
-            for (const action of card.actions) {
+            for (const action of task.actions) {
                 if (action.type === 'commentCard') {
                     markdown += `\n**${action.memberCreator.fullName}** (${action.date}):\n`;
                     markdown += `> ${action.data.text}\n`;
@@ -180,7 +180,7 @@ class TrelloBoard {
             }
         }
         
-        markdown += `\n**URL**: ${card.shortUrl}\n`;
+        markdown += `\n**URL**: ${task.shortUrl}\n`;
         
         return markdown;
     }
@@ -197,9 +197,9 @@ class TrelloBoard {
      * @param {Array<string>} [options.idLabels] - Array of label IDs to add
      * @returns {Promise<string>} Markdown formatted confirmation with card details
      */
-    async createCard(idList, options = {}) {
+    async createTask(idList, options = {}) {
         if (!idList) {
-            throw new Error('List ID is required to create a card');
+            throw new Error('List ID is required to create a task');
         }
         
         // Build the request parameters
@@ -209,43 +209,43 @@ class TrelloBoard {
         };
         
         try {
-            const card = await this.connection.makeRequest('cards', params, 'POST');
+            const task = await this.connection.makeRequest('cards', params, 'POST');
             
             // Return a markdown formatted confirmation
-            let markdown = `# Card Created Successfully\n\n`;
-            markdown += `## ${card.name}\n`;
-            markdown += `- **ID**: \`${card.id}\`\n`;
-            markdown += `- **List ID**: \`${card.idList}\`\n`;
+            let markdown = `# Task Created Successfully\n\n`;
+            markdown += `## ${task.name}\n`;
+            markdown += `- **ID**: \`${task.id}\`\n`;
+            markdown += `- **List ID**: \`${task.idList}\`\n`;
             
-            if (card.desc) {
-                markdown += `\n### Description\n${card.desc}\n`;
+            if (task.desc) {
+                markdown += `\n### Description\n${task.desc}\n`;
             }
             
-            if (card.due) {
-                markdown += `\n### Due Date\n${card.due}\n`;
+            if (task.due) {
+                markdown += `\n### Due Date\n${task.due}\n`;
             }
             
-            if (card.url) {
-                markdown += `\n**URL**: ${card.url}\n`;
-            } else if (card.shortUrl) {
-                markdown += `\n**URL**: ${card.shortUrl}\n`;
+            if (task.url) {
+                markdown += `\n**URL**: ${task.url}\n`;
+            } else if (task.shortUrl) {
+                markdown += `\n**URL**: ${task.shortUrl}\n`;
             }
             
             return markdown;
         } catch (error) {
-            throw new Error(`Failed to create card: ${error.message}`);
+            throw new Error(`Failed to create task: ${error.message}`);
         }
     }
 
     /**
-     * Add a comment to a card
-     * @param {string} cardId - The ID of the card to comment on
+     * Add a comment to a task
+     * @param {string} taskId - The ID of the task to comment on
      * @param {string} text - The comment text
      * @returns {Promise<string>} Markdown formatted confirmation
      */
-    async commentCard(cardId, text) {
-        if (!cardId) {
-            throw new Error('Card ID is required to add a comment');
+    async commentTask(taskId, text) {
+        if (!taskId) {
+            throw new Error('Task ID is required to add a comment');
         }
         
         if (!text) {
@@ -254,7 +254,7 @@ class TrelloBoard {
         
         try {
             await this.connection.makeRequest(
-                `cards/${cardId}/actions/comments`,
+                `cards/${taskId}/actions/comments`,
                 { text },
                 'POST'
             );
@@ -267,32 +267,32 @@ class TrelloBoard {
     }
 
     /**
-     * Mark a card as completed (sets dueComplete to true)
-     * Note: This only works for cards that have a due date set
-     * @param {string} cardId - The ID of the card to mark as completed
+     * Mark a task as completed (sets dueComplete to true)
+     * Note: This only works for tasks that have a due date set
+     * @param {string} taskId - The ID of the task to mark as completed
      * @returns {Promise<string>} Markdown formatted confirmation
      */
-    async markCardCompleted(cardId) {
-        if (!cardId) {
-            throw new Error('Card ID is required to mark as completed');
+    async markTaskCompleted(taskId) {
+        if (!taskId) {
+            throw new Error('Task ID is required to mark as completed');
         }
         try {
-            await this.connection.makeRequest(`cards/${cardId}`, { dueComplete: true }, 'PUT');
-            return `# Card Marked as Completed\n\n`;
+            await this.connection.makeRequest(`cards/${taskId}`, { dueComplete: true }, 'PUT');
+            return `# Task Marked as Completed\n\n`;
         } catch (error) {
-            throw new Error(`Failed to mark card as completed: ${error.message}`);
+            throw new Error(`Failed to mark task as completed: ${error.message}`);
         }
     }
 
-    async archiveCard(cardId) {
-        if (!cardId) {
-            throw new Error('Card ID is required to mark as completed');
+    async archiveTask(taskId) {
+        if (!taskId) {
+            throw new Error('Task ID is required to archive');
         }
         try {
-            await this.connection.makeRequest(`cards/${cardId}`, { closed: true }, 'PUT');
-            return `# Archived Card\n\n`;
+            await this.connection.makeRequest(`cards/${taskId}`, { closed: true }, 'PUT');
+            return `# Archived Task\n\n`;
         } catch (error) {
-            throw new Error(`Failed to archive card: ${error.message}`);
+            throw new Error(`Failed to archive task: ${error.message}`);
         }
     }
 }

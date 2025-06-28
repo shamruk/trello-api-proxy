@@ -14,22 +14,22 @@ async function main() {
         // Get lists
         console.log(await board.getLists());
         
-        // Get all cards
-        console.log(await board.getAllCards());
+        // Get all tasks
+        console.log(await board.getAllTasks());
         
-        // Get cards from specific list
-        console.log('\nGetting cards from "ToDo" list:');
-        console.log(await board.getCards('ToDo'));
+        // Get tasks from specific list
+        console.log('\nGetting tasks from "ToDo" list:');
+        console.log(await board.getTasks('ToDo'));
         
-        // Get specific card details if needed
-        const cardId = '685f1bb73f21f8cc53d5a586'; // "Add create task/card method"
-        console.log(await board.getCard(cardId));
+        // Get specific task details if needed
+        const taskId = '685f1bb73f21f8cc53d5a586'; // "Add create task/card method"
+        console.log(await board.getTask(taskId));
         
-        // Example: Add a comment to a card
-        console.log('\nAdding a comment to a card:');
+        // Example: Add a comment to a task
+        console.log('\nAdding a comment to a task:');
         try {
-            const commentResult = await board.commentCard(
-                cardId,
+            const commentResult = await board.commentTask(
+                taskId,
                 'This is a demo comment added via the API!'
             );
             console.log(commentResult);
@@ -37,24 +37,25 @@ async function main() {
             console.log('Note: Comment feature requires write permissions');
         }
         
-        // Example: Mark a card as completed
-        console.log('\nMarking a card as completed:');
+        // Example: Mark a task as completed
+        console.log('\nMarking a task as completed:');
         try {
-            // Create a test card first to mark as completed
+            // Create a test task first to mark as completed
             const lists = await board.connection.makeRequest(`boards/${board.boardId}/lists`, { fields: 'id,name' });
             const todoList = lists.find(list => list.name === 'ToDo');
             
-            const newCard = await board.createCard(todoList.id, {
-                name: 'Demo card to mark as completed',
-                desc: 'This card will be marked as completed'
+            const newTask = await board.createTask(todoList.id, {
+                name: 'Demo task to mark as completed',
+                desc: 'This task will be marked as completed',
+                due: new Date(Date.now() + 24*60*60*1000).toISOString()
             });
             
-            // Extract card ID from the markdown
-            const newCardIdMatch = newCard.match(/- \*\*ID\*\*: `([^`]+)`/);
-            const newCardId = newCardIdMatch ? newCardIdMatch[1] : null;
+            // Extract task ID from the markdown
+            const newTaskIdMatch = newTask.match(/- \*\*ID\*\*: `([^`]+)`/);
+            const newTaskId = newTaskIdMatch ? newTaskIdMatch[1] : null;
             
-            if (newCardId) {
-                const completedResult = await board.markCardCompleted(newCardId);
+            if (newTaskId) {
+                const completedResult = await board.markTaskCompleted(newTaskId);
                 console.log(completedResult);
             }
         } catch (error) {

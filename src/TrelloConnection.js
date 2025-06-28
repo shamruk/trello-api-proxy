@@ -24,8 +24,8 @@ class TrelloConnection {
      * Make authenticated request to Trello API
      * @param {string} endpoint - API endpoint
      * @param {Object} params - Additional query parameters
-     * @param {string} method - HTTP method (GET or POST)
-     * @param {Object} data - Request body data for POST requests
+     * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
+     * @param {Object} data - Request body data for POST/PUT requests
      * @returns {Promise<any>} API response data
      */
     async makeRequest(endpoint, params = {}, method = 'GET', data = null) {
@@ -39,7 +39,7 @@ class TrelloConnection {
                 params: requestParams
             };
             
-            if (method === 'POST' && data) {
+            if ((method === 'POST' || method === 'PUT') && data) {
                 config.data = data;
             }
             

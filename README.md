@@ -2,6 +2,16 @@
 
 A simplified Trello API proxy that returns data in markdown format optimized for LLM consumption.
 
+## Examples
+
+### How to get tasks from a list
+```
+      import { boardFromUrl } from './trello-proxy.js';
+      const boardUrl = YOUR_BOARD_URL;
+      const board = await boardFromUrl(boardUrl);
+      const todoCards = await board.getCards(TARGET_LIST_NAME);
+```      
+
 ## Features
 
 - **Get Boards**: Retrieve all accessible boards (id and name only)

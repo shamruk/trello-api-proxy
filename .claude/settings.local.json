@@ -7,7 +7,10 @@
       "Bash(DEMO_CREATE_CARD=true node demo.js)",
       "Bash(TRELLO_BOARD_ID=685f1a6eea6a274a8a412416 DEMO_CREATE_CARD=true node demo.js)",
       "Bash(mkdir:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(curl:*)",
+      "Bash(source .env)",
+      "Bash(chmod:*)"
     ],
     "deny": []
   }

@@ -236,6 +236,65 @@ class TrelloBoard {
             throw new Error(`Failed to create card: ${error.message}`);
         }
     }
+
+    /**
+     * Add a comment to a card
+     * @param {string} cardId - The ID of the card to comment on
+     * @param {string} text - The comment text
+     * @returns {Promise<string>} Markdown formatted confirmation
+     */
+    async commentCard(cardId, text) {
+        if (!cardId) {
+            throw new Error('Card ID is required to add a comment');
+        }
+        
+        if (!text) {
+            throw new Error('Comment text is required');
+        }
+        
+        try {
+            await this.connection.makeRequest(
+                `cards/${cardId}/actions/comments`,
+                { text },
+                'POST'
+            );
+            
+            // Return a markdown formatted confirmation
+            return `# Comment Added Successfully\n\n`;            
+        } catch (error) {
+            throw new Error(`Failed to add comment: ${error.message}`);
+        }
+    }
+
+    /**
+     * Mark a card as completed (sets dueComplete to true)
+     * Note: This only works for cards that have a due date set
+     * @param {string} cardId - The ID of the card to mark as completed
+     * @returns {Promise<string>} Markdown formatted confirmation
+     */
+    async markCardCompleted(cardId) {
+        if (!cardId) {
+            throw new Error('Card ID is required to mark as completed');
+        }
+        try {
+            await this.connection.makeRequest(`cards/${cardId}`, { dueComplete: true }, 'PUT');
+            return `# Card Marked as Completed\n\n`;
+        } catch (error) {
+            throw new Error(`Failed to mark card as completed: ${error.message}`);
+        }
+    }
+
+    async archiveCard(cardId) {
+        if (!cardId) {
+            throw new Error('Card ID is required to mark as completed');
+        }
+        try {
+            await this.connection.makeRequest(`cards/${cardId}`, { closed: true }, 'PUT');
+            return `# Archived Card\n\n`;
+        } catch (error) {
+            throw new Error(`Failed to archive card: ${error.message}`);
+        }
+    }
 }
 
 export default TrelloBoard;
